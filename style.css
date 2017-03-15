@@ -12,3 +12,16 @@ html, body {
   border: 0;
   height: 30px;
 }
+li {
+  list-style-type: none;
+}
+.results {
+    display: flex;
+}
+.resultitem {
+  display: flex;
+}
+
+.resultcontent {
+  flex: 1;
+}
