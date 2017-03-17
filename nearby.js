@@ -24,6 +24,7 @@ document.addEventListener('DOMContentLoaded', function() {
 let map;
 let service;
 let places = [];
+let detailedPlaces = [];
 //initialize map object and assign to map variable
 function initMap() {
     //console.log(currentPosition);
@@ -44,6 +45,7 @@ function initMap() {
         });
       };
 
+    //attach the Places service to this map
     service = new google.maps.places.PlacesService(map);
 
     const searchQuery = document.querySelector('.search-locations');
@@ -54,9 +56,11 @@ function initMap() {
     map.addListener('bounds_changed', function() {
         searchBox.setBounds(map.getBounds());
     });
-
+    //listener to figure out what the user selected.
     searchBox.addListener('places_changed', function() {
+
         places = searchBox.getPlaces();
+
         search(places);
       });
 };
@@ -64,15 +68,21 @@ function initMap() {
 function search(places){
 
   let resultList = document.querySelector('.locations');
-  console.log(places);
-  resultList.innerHTML = places.map(location => {
-      return `<div class="resultitem">
-                                        <div class="resultcontent"><img src=${location.icon} /></div>
-                                        <div class="resultcontent"><p>${location.name}</p></div>
-                                        <div class="resultcontent"><p>${location.formatted_address}</p></div>
-                                      </div>`;
-  }).join('');
 
-  console.log(resultList);
+  places.forEach(location => {
+    console.log(location.place_id);
+        service.getDetails({placeId: location.place_id}, (place, status) => { if(status === google.maps.places.PlacesServiceStatus.OK){detailedPlaces.push(place)}});
+  })
+
+  //console.log(detailPlaces);
+
+  // resultList.innerHTML = places.map(location => {
+  //     return `<div class="resultitem">
+  //                                       <div class="resultcontent"><img src=${location.icon} /></div>
+  //                                       <div class="resultcontent"><p>${location.name}</p></div>
+  //                                       <div class="resultcontent"><p>${location.formatted_address}</p></div>
+  //                                     </div>`;
+  // }).join('');
+
 
 };
