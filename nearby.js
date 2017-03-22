@@ -60,81 +60,42 @@ function initMap() {
     searchBox.addListener('places_changed', function() {
 
         places = searchBox.getPlaces();
-        console.log(places);
+        //console.log(places.length);
         // search(places);
-        detailedPlaces = places.map(function(placeQuery){
-              search(placeQuery.place_id).then(function(result){
-                  console.log(result);
-              })
-        });
+          if(places.length === 0){
+            console.log('places empty');
+            return;
+          }
+
+          Promise.all(places.map(search))
+              .then(function(results){
+                console.log(results);
+              });
 
 
       });
 };
 
-// function search(places){
-//
-//   let resultList = document.querySelector('.locations');
-//   places.forEach(location => {
-//
-//       setTimeout(function(){
-//         service.getDetails({placeId: location.place_id}, (place, status) =>
-//               {
-//                 console.log(place);
-//                 if(status === google.maps.places.PlacesServiceStatus.OK){
-//                     detailedPlaces.push(place)
-//                   }
-//             });
-//           }, places.indexOf(location)*280);
-//   });
-//
-//   // resultList.innerHTML = places.map(location => {
-//   //     return `<div class="resultitem">
-//   //                                       <div class="resultcontent"><img src=${location.icon} /></div>
-//   //                                       <div class="resultcontent"><p>${location.name}</p></div>
-//   //                                       <div class="resultcontent"><p>${location.formatted_address}</p></div>
-//   //                                     </div>`;
-//   // }).join('');
-//
-//
-// };
+function search(placeQuery){
 
-function search(placeQuery, resolve){
-
-  // let resultList = document.querySelector('.locations');
-
-  return new Promise(function(resolve){
+  return new Promise(function(resolve, reject){
       setTimeout(function(){
         service.getDetails({placeId: placeQuery}, (place, status) =>
               {
+               console.log(placeQuery);
                 if(status === google.maps.places.PlacesServiceStatus.OK){
-                      // return place;
-                        resolve(place);
+                      resolve(place);
+                  } else {
+                      reject(status);
                   }
 
             });
-          }, places.indexOf(location)*280);
+          }, 300);
+  })
+};
 
-  // places.forEach(location => {
-  //
-  //     setTimeout(function(){
-  //       service.getDetails({placeId: location.place_id}, (place, status) =>
-  //             {
-  //               console.log(place);
-  //               if(status === google.maps.places.PlacesServiceStatus.OK){
-  //                   detailedPlaces.push(place)
-  //                 }
-  //           });
-  //         }, places.indexOf(location)*280);
-  // });
+function renderList(locations){
 
-  // resultList.innerHTML = places.map(location => {
-  //     return `<div class="resultitem">
-  //                                       <div class="resultcontent"><img src=${location.icon} /></div>
-  //                                       <div class="resultcontent"><p>${location.name}</p></div>
-  //                                       <div class="resultcontent"><p>${location.formatted_address}</p></div>
-  //                                     </div>`;
-  // }).join('');
+  
 
-})
 };

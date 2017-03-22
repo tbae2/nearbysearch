@@ -6,11 +6,13 @@ html, body {
 
 .map {
   height: 50%;
+  width: 50%;
 }
 .search-locations {
   margin-top: 15px;
   border: 0;
   height: 30px;
+  width: 400px;
 }
 li {
   list-style-type: none;
