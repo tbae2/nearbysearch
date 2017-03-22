@@ -59,6 +59,7 @@ function initMap() {
     //listener to figure out what the user selected.
     searchBox.addListener('places_changed', function() {
 
+      let sectionedPlaces = [];
         places = searchBox.getPlaces();
         //console.log(places.length);
         // search(places);
@@ -66,36 +67,57 @@ function initMap() {
             console.log('places empty');
             return;
           }
+        for(var i = 0; i < places.length; i += 4){
+            sectionedPlaces.push(places.slice(i,i + 4));
+        }
 
-          Promise.all(places.map(search))
-              .then(function(results){
-                console.log(results);
-              });
 
+          //takes an array of promises, maps over them and returns only when they're all complete
+        sectionedPlaces.forEach(function(placeSection){
+          //work around the 5 queries a second limit imposed by Google
+            setTimeout(function(){
+                  let placePromises = placeSection.map(function(place){
+                        return searchPlaces(place);
+                  });
+
+                  Promise.all(placePromises)
+                      .then(function(result){
+                          renderList(result);
+                      })
+            }, sectionedPlaces.indexOf(placeSection) * 1400);
+        });
 
       });
 };
 
-function search(placeQuery){
-
-  return new Promise(function(resolve, reject){
-      setTimeout(function(){
-        service.getDetails({placeId: placeQuery}, (place, status) =>
+function searchPlaces(placeQuery){
+  //return a promise object
+  return new Promise(
+        function(resolve, reject){
+          service.getDetails({placeId: placeQuery.place_id}, (place, status) =>
               {
-               console.log(placeQuery);
                 if(status === google.maps.places.PlacesServiceStatus.OK){
                       resolve(place);
                   } else {
                       reject(status);
                   }
-
             });
-          }, 300);
-  })
+          });
 };
 
 function renderList(locations){
+    console.log(locations);
+        let addResult = document.createElement('div');
+        let resultLocations = document.querySelector('.locations');
 
-  
+       addResult.innerHTML = locations.map(location => {
+       return `<div class="resultitem">
+               <div class="resultcontent"><img src=${location.icon} /></div>
+               <div class="resultcontent"><p>${location.name}</p></div>
+               <div class="resultcontent"><p>${location.formatted_address}</p></div>
+               </div>`;
+                          }).join('');
+
+        resultLocations.appendChild(addResult);
 
 };
